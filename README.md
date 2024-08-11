@@ -2,8 +2,6 @@
 
 **Typing Speed Trainer** is a React-based application designed to help users improve their typing speed and accuracy. The app provides a typing test with real-time feedback, tracking errors, and calculating typing speed in words per minute (WPM).
 
-![Typing Speed Trainer](./assets/preview.png) <!-- You can replace this with a screenshot or remove it if you don't have one -->
-
 ## Features
 
 - **Typing Test**: Users type a provided text and receive real-time feedback on their typing accuracy.
