@@ -25,6 +25,7 @@ const TextDisplay = () => {
     isCompleted,
   } = useSelector(state => getUsersState(state));
   const [isCapsLock, setIsCapsLock] = useState(false);
+  const [focusInput, setFocusInput] = useState(false); // Состояние для управления фокусом на textarea
 
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
     // Проверка состояния Caps Lock при любом нажатии клавиши
@@ -37,7 +38,7 @@ const TextDisplay = () => {
     }
 
     if (e.key === ' ') {
-      e.preventDefault();
+      e.preventDefault(); // Предотвращение прокрутки страницы при нажатии пробела
     }
 
     if (e.key === 'Backspace') {
@@ -77,6 +78,29 @@ const TextDisplay = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [handleKeyPress, isCompleted]);
 
+  const handleTextareaClick = () => setFocusInput(true);
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const currentInput = e.target.value;
+
+    if (
+      text[userInput.length] &&
+      currentInput[userInput.length] !==
+      text[userInput.length]
+    ) {
+      dispatch(incrementErrors());
+    }
+
+    if (currentInput.length <= text.length) {
+      dispatch(setUserInput(currentInput));
+    }
+
+    if (currentInput.length === text.length) {
+      dispatch(completeTest());
+      dispatch(endTest());
+    }
+  };
+
   const renderedText = useMemo(() => {
     // Показываем букву в зависимости от корректности ввода
     return text.split('').map((char, i) => {
@@ -90,10 +114,32 @@ const TextDisplay = () => {
     });
   }, [text, userInput]);
 
+  const textareaFocus = () => dispatch(startTest())
+
   return (
     <Display>
-      <span>{renderedText}</span>
-      {isCapsLock && <Warning>Caps Lock is ON</Warning>}
+      <textarea
+        value={userInput}
+        onChange={handleTextareaChange}
+        onFocus={textareaFocus}
+        onClick={handleTextareaClick}
+        aria-label="Typing input"
+        autoFocus={focusInput}
+        style={{
+          position: 'absolute',
+          opacity: 0,
+          width: '100%',
+          height: '100%',
+          fontSize: '24px',
+          border: 'none',
+          resize: 'none',
+          overflow: 'hidden'
+        }}
+      />
+      <div style={{ position: 'relative' }}>
+        <span>{renderedText}</span>
+        {isCapsLock && <Warning>Caps Lock is ON</Warning>}
+      </div>
     </Display>
   );
 };
